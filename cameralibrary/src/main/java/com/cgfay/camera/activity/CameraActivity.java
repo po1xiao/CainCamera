@@ -7,14 +7,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Environment;
 import android.text.TextUtils;
 import android.view.WindowManager;
 
 import com.cgfay.cameralibrary.R;
 import com.cgfay.camera.fragment.CameraPreviewFragment;
-import com.cgfay.facedetect.engine.FaceTracker;
+//import com.cgfay.facedetect.engine.FaceTracker;
 import com.cgfay.uitls.utils.NotchUtils;
+import com.zeusee.main.hyperlandmark.FileUtil;
+
+import java.io.File;
 
 /**
  * 相机预览页面
@@ -24,6 +30,7 @@ public class CameraActivity extends AppCompatActivity {
     private static final String FRAGMENT_CAMERA = "fragment_camera";
 
     private CameraPreviewFragment mPreviewFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,14 +42,23 @@ public class CameraActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container, mPreviewFragment, FRAGMENT_CAMERA)
                     .commit();
         }
-        faceTrackerRequestNetwork();
+//        faceTrackerRequestNetwork();
+        initModelFiles();
     }
 
-    /**
-     * 人脸检测SDK验证，可以替换成自己的SDK
-     */
-    private void faceTrackerRequestNetwork() {
-        new Thread(() -> FaceTracker.requestFaceNetwork(CameraActivity.this)).start();
+    //    /**
+//     * 人脸检测SDK验证，可以替换成自己的SDK
+//     */
+//    private void faceTrackerRequestNetwork() {
+//        new Thread(() -> FaceTracker.requestFaceNetwork(CameraActivity.this)).start();
+//    }
+    private void initModelFiles() {
+
+        String assetPath = "ZeuseesFaceTracking";
+        String sdcardPath = Environment.getExternalStorageDirectory()
+                + File.separator + assetPath;
+        FileUtil.copyFilesFromAssets(this, assetPath, sdcardPath);
+
     }
 
     @Override
@@ -98,6 +114,7 @@ public class CameraActivity extends AppCompatActivity {
     private BroadcastReceiver mHomePressReceiver = new BroadcastReceiver() {
         private final String SYSTEM_DIALOG_REASON_KEY = "reason";
         private final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

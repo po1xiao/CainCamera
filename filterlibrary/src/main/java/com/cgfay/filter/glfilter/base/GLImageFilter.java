@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.opengl.GLES30;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.cgfay.filter.glfilter.utils.OpenGLUtils;
 import com.cgfay.filter.glfilter.utils.TextureRotationUtils;
@@ -36,7 +37,7 @@ public class GLImageFilter {
             "}                                                          \n";
 
 
-    protected String TAG = getClass().getSimpleName();
+    protected String TAG ="GLImageFilter";
 
     protected Context mContext;
 
@@ -113,6 +114,7 @@ public class GLImageFilter {
 
     /**
      * Surface发生变化时调用
+     *
      * @param width
      * @param height
      */
@@ -122,7 +124,8 @@ public class GLImageFilter {
     }
 
     /**
-     *  显示视图发生变化时调用
+     * 显示视图发生变化时调用
+     *
      * @param width
      * @param height
      */
@@ -133,17 +136,20 @@ public class GLImageFilter {
 
     /**
      * 绘制Frame
+     *
      * @param textureId
      * @param vertexBuffer
      * @param textureBuffer
      */
     public boolean drawFrame(int textureId, FloatBuffer vertexBuffer,
-                          FloatBuffer textureBuffer) {
+                             FloatBuffer textureBuffer) {
+
         // 没有初始化、输入纹理不合法、滤镜不可用时直接返回
         if (!mIsInitialized || textureId == OpenGLUtils.GL_NOT_INIT || !mFilterEnable) {
+            Log.d(TAG, "drawFrame return");
             return false;
         }
-
+        //Log.d(TAG, "drawFrame mDisplayWidth = " + mDisplayWidth + "; mDisplayHeight = " + mDisplayHeight);
         // 设置视口大小
         GLES30.glViewport(0, 0, mDisplayWidth, mDisplayHeight);
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -155,7 +161,6 @@ public class GLImageFilter {
         runPendingOnDrawTasks();
 
 
-
         // 绘制纹理
         onDrawTexture(textureId, vertexBuffer, textureBuffer);
 
@@ -164,6 +169,7 @@ public class GLImageFilter {
 
     /**
      * 绘制到FBO
+     *
      * @param textureId
      * @param vertexBuffer
      * @param textureBuffer
@@ -228,6 +234,7 @@ public class GLImageFilter {
 
     /**
      * 绘制
+     *
      * @param textureId
      * @param vertexBuffer
      * @param textureBuffer
@@ -303,6 +310,7 @@ public class GLImageFilter {
 
     /**
      * 创建FBO
+     *
      * @param width
      * @param height
      */
@@ -344,6 +352,7 @@ public class GLImageFilter {
 
     /**
      * 判断是否初始化
+     *
      * @return
      */
     public boolean isInitialized() {
@@ -352,6 +361,7 @@ public class GLImageFilter {
 
     /**
      * 设置滤镜是否可用
+     *
      * @param enable
      */
     public void setFilterEnable(boolean enable) {
@@ -360,6 +370,7 @@ public class GLImageFilter {
 
     /**
      * 获取输出宽度
+     *
      * @return
      */
     public int getDisplayWidth() {
@@ -368,6 +379,7 @@ public class GLImageFilter {
 
     /**
      * 获取输出高度
+     *
      * @return
      */
     public int getDisplayHeight() {
@@ -464,6 +476,7 @@ public class GLImageFilter {
 
     /**
      * 添加延时任务
+     *
      * @param runnable
      */
     protected void runOnDraw(final Runnable runnable) {

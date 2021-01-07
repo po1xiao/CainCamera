@@ -3,6 +3,7 @@ package com.cgfay.filter.glfilter.face;
 import android.content.Context;
 import android.opengl.GLES30;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.cgfay.filter.glfilter.base.GLImageFilter;
@@ -17,7 +18,7 @@ import java.nio.FloatBuffer;
  * TODO 这里这里会频繁触发GC，后续优化
  */
 public class GLImageFacePointsFilter extends GLImageFilter {
-
+    private static final String TAG = "GLImageFacePointsFilter";
     private static final String VertexShader = "" +
             "attribute vec4 aPosition;\n" +
             "void main() {\n" +
@@ -31,6 +32,7 @@ public class GLImageFacePointsFilter extends GLImageFilter {
             "void main() {\n" +
             "    gl_FragColor = color;\n" +
             "}";
+
 
     // 关键点滤镜
     private final float color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -103,6 +105,7 @@ public class GLImageFacePointsFilter extends GLImageFilter {
                         GLES30.glVertexAttribPointer(mPositionHandle, 2,
                                 GLES30.GL_FLOAT, false, 8, mPointVertexBuffer);
                         GLES30.glDrawArrays(GLES30.GL_POINTS, 0, mPointCount);
+                        Log.d(TAG, "drawFrame mPointCount = " + mPointCount);
                     }
                 }
             }

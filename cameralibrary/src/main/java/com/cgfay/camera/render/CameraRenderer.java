@@ -339,6 +339,7 @@ public class CameraRenderer extends Thread {
      */
     void onDrawFrame() {
         if (mDisplaySurface == null || mWeakSurfaceTexture == null || mWeakSurfaceTexture.get() == null) {
+            Log.d(TAG, "onDrawFrame return 1");
             return;
         }
         // 切换渲染上下文
@@ -354,6 +355,7 @@ public class CameraRenderer extends Thread {
 
         // 如果不存在外部输入纹理，则直接返回，不做处理
         if (mInputTexture == OpenGLUtils.GL_NOT_TEXTURE) {
+            Log.d(TAG, "onDrawFrame return 2");
             return;
         }
         // 绘制渲染

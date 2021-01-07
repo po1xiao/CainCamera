@@ -5,11 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
-import androidx.annotation.NonNull;
-
 import android.opengl.EGLContext;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.cgfay.camera.activity.CameraSettingActivity;
 import com.cgfay.camera.camera.CameraController;
@@ -18,14 +18,12 @@ import com.cgfay.camera.camera.ICameraController;
 import com.cgfay.camera.camera.OnFrameAvailableListener;
 import com.cgfay.camera.camera.OnSurfaceTextureListener;
 import com.cgfay.camera.camera.PreviewCallback;
+import com.cgfay.camera.fragment.CameraPreviewFragment;
 import com.cgfay.camera.listener.OnCaptureListener;
 import com.cgfay.camera.listener.OnFpsListener;
-import com.cgfay.camera.fragment.CameraPreviewFragment;
 import com.cgfay.camera.listener.OnPreviewCaptureListener;
 import com.cgfay.camera.render.CameraRenderer;
 import com.cgfay.camera.utils.PathConstraints;
-import com.cgfay.facedetect.engine.FaceTracker;
-import com.cgfay.facedetect.listener.FaceTrackerCallback;
 import com.cgfay.filter.glfilter.color.bean.DynamicColor;
 import com.cgfay.filter.glfilter.makeup.bean.DynamicMakeup;
 import com.cgfay.filter.glfilter.resource.FilterHelper;
@@ -34,6 +32,8 @@ import com.cgfay.filter.glfilter.resource.ResourceJsonCodec;
 import com.cgfay.filter.glfilter.resource.bean.ResourceData;
 import com.cgfay.filter.glfilter.resource.bean.ResourceType;
 import com.cgfay.filter.glfilter.stickers.bean.DynamicSticker;
+import com.cgfay.landmark.LandmarkEngine;
+import com.cgfay.media.CainCommandEditor;
 import com.cgfay.media.recorder.AudioParams;
 import com.cgfay.media.recorder.HWMediaRecorder;
 import com.cgfay.media.recorder.MediaInfo;
@@ -42,20 +42,21 @@ import com.cgfay.media.recorder.OnRecordStateListener;
 import com.cgfay.media.recorder.RecordInfo;
 import com.cgfay.media.recorder.SpeedMode;
 import com.cgfay.media.recorder.VideoParams;
-import com.cgfay.landmark.LandmarkEngine;
-import com.cgfay.media.CainCommandEditor;
 import com.cgfay.uitls.utils.BitmapUtils;
 import com.cgfay.uitls.utils.BrightnessUtils;
 import com.cgfay.uitls.utils.FileUtils;
 import com.cgfay.video.activity.VideoEditActivity;
+import com.zeusee.main.hyperlandmark.jni.FaceTracking;
+import com.zeusee.main.hyperlandmark.listener.FaceTrackerCallback;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * 预览的presenter
+ *
  * @author CainHuang
  * @date 2019/7/3
  */
@@ -146,13 +147,14 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
         } else {
             mCameraParam.brightness = BrightnessUtils.getSystemBrightness(mActivity);
         }
-
         // 初始化检测器
-        FaceTracker.getInstance()
+        FaceTracking.getInstance()
+                .enable106Points(true)
                 .setFaceCallback(this)
                 .previewTrack(true)
                 .initTracker();
     }
+
 
     @Override
     public void onStart() {
@@ -185,7 +187,7 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
     public void onDestroy() {
         super.onDestroy();
         // 销毁人脸检测器
-        FaceTracker.getInstance().destroyTracker();
+        FaceTracking.getInstance().destroyTracker();
         // 清理关键点
         LandmarkEngine.getInstance().clearAll();
         if (mHWMediaRecorder != null) {
@@ -479,7 +481,8 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
                 "orientation - " + mCameraController.getOrientation()
                 + "width - " + mCameraController.getPreviewWidth()
                 + ", height - " + mCameraController.getPreviewHeight());
-        FaceTracker.getInstance()
+
+        FaceTracking.getInstance()
                 .setBackCamera(!mCameraController.isFront())
                 .prepareFaceTracker(mActivity,
                         mCameraController.getOrientation(),
@@ -499,22 +502,21 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
     public void onPreviewFrame(byte[] data) {
         Log.d(TAG, "onPreviewFrame: width - " + mCameraController.getPreviewWidth()
                 + ", height - " + mCameraController.getPreviewHeight());
-        FaceTracker.getInstance()
-                .trackFace(data, mCameraController.getPreviewWidth(),
-                        mCameraController.getPreviewHeight());
+        FaceTracking.getInstance().trackFace(data, mCameraController.getPreviewWidth(),
+                mCameraController.getPreviewHeight());
     }
 
     // ---------------------------------- 人脸检测完成回调 ------------------------------------------
     @Override
     public void onTrackingFinish() {
-        Log.d(TAG, "onTrackingFinish: ");
+        Log.d(TAG, "onTrackingFinish: mCameraRenderer.requestRender()");
         mCameraRenderer.requestRender();
     }
 
     // ------------------------------ SurfaceTexture帧可用回调 --------------------------------------
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-//        mCameraRenderer.requestRender();
+        // mCameraRenderer.requestRender();
     }
 
     // ---------------------------------- 录制与合成 start ------------------------------------------
@@ -627,6 +629,7 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
 
     /**
      * 创建合成的视频文件名
+     *
      * @return
      */
     public String generateOutputPath() {
@@ -635,6 +638,7 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
 
     /**
      * 打开视频编辑页面
+     *
      * @param path
      */
     public void onOpenVideoEditPage(String path) {
@@ -655,8 +659,10 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
     }
 
     // ------------------------------------ 渲染fps回调 ------------------------------------------
+
     /**
      * fps数值回调
+     *
      * @param fps
      */
     @Override

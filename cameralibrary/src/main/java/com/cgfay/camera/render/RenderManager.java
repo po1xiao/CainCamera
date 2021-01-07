@@ -34,6 +34,7 @@ import java.nio.FloatBuffer;
  * 渲染管理器
  */
 public final class RenderManager {
+    private static final String TAG = "RenderManager";
 
     public RenderManager() {
         mCameraParam = CameraParam.getInstance();
@@ -125,6 +126,7 @@ public final class RenderManager {
 
     /**
      * 初始化滤镜
+     *
      * @param context
      */
     private void initFilters(Context context) {
@@ -154,6 +156,7 @@ public final class RenderManager {
 
     /**
      * 是否切换边框模糊
+     *
      * @param enableEdgeBlur
      */
     public synchronized void changeEdgeBlurFilter(boolean enableEdgeBlur) {
@@ -174,6 +177,7 @@ public final class RenderManager {
 
     /**
      * 切换动态滤镜
+     *
      * @param color
      */
     public synchronized void changeDynamicFilter(DynamicColor color) {
@@ -193,11 +197,12 @@ public final class RenderManager {
 
     /**
      * 切换动态滤镜
+     *
      * @param dynamicMakeup
      */
     public synchronized void changeDynamicMakeup(DynamicMakeup dynamicMakeup) {
         if (mFilterArrays.get(RenderIndex.MakeupIndex) != null) {
-            ((GLImageMakeupFilter)mFilterArrays.get(RenderIndex.MakeupIndex)).changeMakeupData(dynamicMakeup);
+            ((GLImageMakeupFilter) mFilterArrays.get(RenderIndex.MakeupIndex)).changeMakeupData(dynamicMakeup);
         } else {
             GLImageMakeupFilter filter = new GLImageMakeupFilter(mContext, dynamicMakeup);
             filter.onInputSizeChanged(mTextureWidth, mTextureHeight);
@@ -209,6 +214,7 @@ public final class RenderManager {
 
     /**
      * 切换动态资源
+     *
      * @param color
      */
     public synchronized void changeDynamicResource(DynamicColor color) {
@@ -228,6 +234,7 @@ public final class RenderManager {
 
     /**
      * 切换动态资源
+     *
      * @param sticker
      */
     public synchronized void changeDynamicResource(DynamicSticker sticker) {
@@ -249,6 +256,7 @@ public final class RenderManager {
 
     /**
      * 绘制纹理
+     *
      * @param inputTexture
      * @param mMatrix
      * @return
@@ -260,7 +268,7 @@ public final class RenderManager {
             return currentTexture;
         }
         if (mFilterArrays.get(RenderIndex.CameraIndex) instanceof GLImageOESInputFilter) {
-            ((GLImageOESInputFilter)mFilterArrays.get(RenderIndex.CameraIndex)).setTextureTransformMatrix(mMatrix);
+            ((GLImageOESInputFilter) mFilterArrays.get(RenderIndex.CameraIndex)).setTextureTransformMatrix(mMatrix);
         }
         currentTexture = mFilterArrays.get(RenderIndex.CameraIndex)
                 .drawFrameBuffer(currentTexture, mVertexBuffer, mTextureBuffer);
@@ -319,18 +327,25 @@ public final class RenderManager {
 
     /**
      * 绘制调试用的人脸关键点
+     *
      * @param mCurrentTexture
      */
     public void drawFacePoint(int mCurrentTexture) {
         if (mFilterArrays.get(RenderIndex.FacePointIndex) != null) {
             if (mCameraParam.drawFacePoints && LandmarkEngine.getInstance().hasFace()) {
-                mFilterArrays.get(RenderIndex.FacePointIndex).drawFrame(mCurrentTexture, mDisplayVertexBuffer, mDisplayTextureBuffer);
+                boolean isSuccess = mFilterArrays.get(RenderIndex.FacePointIndex).drawFrame(mCurrentTexture, mDisplayVertexBuffer, mDisplayTextureBuffer);
+//                Log.d(TAG, "drawFacePoint drawFrame success is " + isSuccess);
+            } else {
+                Log.d(TAG, "drawFacePoint do not draw point or has no Face");
             }
+        } else {
+            Log.d(TAG, "drawFacePoint mFilterArrays.get(RenderIndex.FacePointIndex) == null");
         }
     }
 
     /**
      * 设置输入纹理大小
+     *
      * @param width
      * @param height
      */
@@ -345,6 +360,7 @@ public final class RenderManager {
 
     /**
      * 获取纹理宽度
+     *
      * @return
      */
     public int getTextureWidth() {
@@ -353,6 +369,7 @@ public final class RenderManager {
 
     /**
      * 获取纹理高度
+     *
      * @return
      */
     public int getTextureHeight() {
@@ -361,6 +378,7 @@ public final class RenderManager {
 
     /**
      * 设置纹理显示大小
+     *
      * @param width
      * @param height
      */
@@ -406,7 +424,7 @@ public final class RenderManager {
         float ratioWidth = (float) imageWidth / (float) mViewWidth;
         float ratioHeight = (float) imageHeight / (float) mViewHeight;
         if (mScaleType == ScaleType.CENTER_INSIDE) {
-            vertexCoord = new float[] {
+            vertexCoord = new float[]{
                     vertexVertices[0] / ratioHeight, vertexVertices[1] / ratioWidth,
                     vertexVertices[2] / ratioHeight, vertexVertices[3] / ratioWidth,
                     vertexVertices[4] / ratioHeight, vertexVertices[5] / ratioWidth,
@@ -415,7 +433,7 @@ public final class RenderManager {
         } else if (mScaleType == ScaleType.CENTER_CROP) {
             float distHorizontal = (1 - 1 / ratioWidth) / 2;
             float distVertical = (1 - 1 / ratioHeight) / 2;
-            textureCoord = new float[] {
+            textureCoord = new float[]{
                     addDistance(textureVertices[0], distHorizontal), addDistance(textureVertices[1], distVertical),
                     addDistance(textureVertices[2], distHorizontal), addDistance(textureVertices[3], distVertical),
                     addDistance(textureVertices[4], distHorizontal), addDistance(textureVertices[5], distVertical),
@@ -440,6 +458,7 @@ public final class RenderManager {
 
     /**
      * 计算距离
+     *
      * @param coordinate
      * @param distance
      * @return
@@ -448,22 +467,23 @@ public final class RenderManager {
         return coordinate == 0.0f ? distance : 1 - distance;
     }
 
-    public static final Vector3 tempVec=new Vector3();
+    public static final Vector3 tempVec = new Vector3();
+
     public StaticStickerNormalFilter touchDown(MotionEvent e) {
 
         if (mFilterArrays.get(RenderIndex.ResourceIndex) != null) {
-          GLImageFilter  glImageFilter = mFilterArrays.get(RenderIndex.ResourceIndex);
-          if(glImageFilter instanceof GLImageDynamicStickerFilter) {
-              GLImageDynamicStickerFilter glImageDynamicStickerFilter= (GLImageDynamicStickerFilter) glImageFilter;
-              tempVec.set(e.getX(), e.getY(), 0);
-              StaticStickerNormalFilter staticStickerNormalFilter=GestureHelp.hit(tempVec,glImageDynamicStickerFilter.getmFilters());
-              if(staticStickerNormalFilter!=null){
-                  Log.d("touchSticker","找到贴纸");
-              }else{
-                  Log.d("touchSticker","没有贴纸");
-              }
-              return staticStickerNormalFilter;
-          }
+            GLImageFilter glImageFilter = mFilterArrays.get(RenderIndex.ResourceIndex);
+            if (glImageFilter instanceof GLImageDynamicStickerFilter) {
+                GLImageDynamicStickerFilter glImageDynamicStickerFilter = (GLImageDynamicStickerFilter) glImageFilter;
+                tempVec.set(e.getX(), e.getY(), 0);
+                StaticStickerNormalFilter staticStickerNormalFilter = GestureHelp.hit(tempVec, glImageDynamicStickerFilter.getmFilters());
+                if (staticStickerNormalFilter != null) {
+                    Log.d("touchSticker", "找到贴纸");
+                } else {
+                    Log.d("touchSticker", "没有贴纸");
+                }
+                return staticStickerNormalFilter;
+            }
         }
 
         return null;
