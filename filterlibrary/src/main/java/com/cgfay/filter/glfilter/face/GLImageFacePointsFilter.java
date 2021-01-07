@@ -105,7 +105,7 @@ public class GLImageFacePointsFilter extends GLImageFilter {
                         GLES30.glVertexAttribPointer(mPositionHandle, 2,
                                 GLES30.GL_FLOAT, false, 8, mPointVertexBuffer);
                         GLES30.glDrawArrays(GLES30.GL_POINTS, 0, mPointCount);
-                        Log.d(TAG, "drawFrame mPointCount = " + mPointCount);
+                        //Log.d(TAG, "drawFrame mPointCount = " + mPointCount);
                     }
                 }
             }

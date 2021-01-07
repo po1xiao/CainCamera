@@ -149,7 +149,7 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
         }
         // 初始化检测器
         FaceTracking.getInstance()
-                .enable106Points(true)
+                //.enable106Points(true)
                 .setFaceCallback(this)
                 .previewTrack(true)
                 .initTracker();

@@ -8,6 +8,7 @@ import android.util.SparseArray;
  */
 public final class LandmarkEngine {
     private static final String TAG = "LandmarkEngine";
+
     private static class EngineHolder {
         public static LandmarkEngine instance = new LandmarkEngine();
     }
@@ -32,6 +33,7 @@ public final class LandmarkEngine {
 
     /**
      * 设置旋转角度
+     *
      * @param orientation
      */
     public void setOrientation(int orientation) {
@@ -40,6 +42,7 @@ public final class LandmarkEngine {
 
     /**
      * 设置是否需要翻转
+     *
      * @param flip
      */
     public void setNeedFlip(boolean flip) {
@@ -48,6 +51,7 @@ public final class LandmarkEngine {
 
     /**
      * 设置人脸数
+     *
      * @param size
      */
     public void setFaceSize(int size) {
@@ -61,6 +65,7 @@ public final class LandmarkEngine {
 
     /**
      * 是否存在人脸
+     *
      * @return
      */
     public boolean hasFace() {
@@ -73,6 +78,7 @@ public final class LandmarkEngine {
 
     /**
      * 获取一个人脸关键点数据对象
+     *
      * @return
      */
     public OneFace getOneFace(int index) {
@@ -88,6 +94,7 @@ public final class LandmarkEngine {
 
     /**
      * 插入一个人脸关键点数据对象
+     *
      * @param index
      */
     public void putOneFace(int index, OneFace oneFace) {
@@ -98,6 +105,7 @@ public final class LandmarkEngine {
 
     /**
      * 获取人脸个数
+     *
      * @return
      */
     public int getFaceSize() {
@@ -106,6 +114,7 @@ public final class LandmarkEngine {
 
     /**
      * 获取人脸列表
+     *
      * @return
      */
     public SparseArray<OneFace> getFaceArrays() {
@@ -123,13 +132,14 @@ public final class LandmarkEngine {
 
     /**
      * 计算额外人脸顶点，新增8个额外顶点坐标
+     *
      * @param vertexPoints
      * @param index
      */
     public void calculateExtraFacePoints(float[] vertexPoints, int index) {
         if (vertexPoints == null || index >= mFaceArrays.size() || mFaceArrays.get(index) == null
                 || mFaceArrays.get(index).vertexPoints.length + 8 * 2 > vertexPoints.length) {
-            Log.d(TAG,"calculateExtraFacePoints return");
+            Log.d(TAG, "calculateExtraFacePoints return");
             return;
         }
         OneFace oneFace = mFaceArrays.get(index);
@@ -139,81 +149,82 @@ public final class LandmarkEngine {
         float[] point = new float[2];
         // 嘴唇中心
         FacePointsUtils.getCenter(point,
-                vertexPoints[FaceLandmark.mouthUpperLipBottom * 2],
-                vertexPoints[FaceLandmark.mouthUpperLipBottom * 2 + 1],
-                vertexPoints[FaceLandmark.mouthLowerLipTop * 2],
-                vertexPoints[FaceLandmark.mouthLowerLipTop * 2 + 1]
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.mouthUpperLipBottom] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.mouthUpperLipBottom] * 2 + 1],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.mouthLowerLipTop] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.mouthLowerLipTop] * 2 + 1]
         );
-        vertexPoints[FaceLandmark.mouthCenter * 2] = point[0];
-        vertexPoints[FaceLandmark.mouthCenter * 2 + 1] = point[1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.mouthCenter] * 2] = point[0];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.mouthCenter] * 2 + 1] = point[1];
 
         // 左眉心
         FacePointsUtils.getCenter(point,
-                vertexPoints[FaceLandmark.leftEyebrowUpperMiddleLeft * 2],
-                vertexPoints[FaceLandmark.leftEyebrowUpperMiddleLeft * 2 + 1],
-                vertexPoints[FaceLandmark.leftEyebrowLowerMiddle * 2],
-                vertexPoints[FaceLandmark.leftEyebrowLowerMiddle * 2 + 1]
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowUpperMiddleLeft] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowUpperMiddleLeft] * 2 + 1],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowLowerMiddleLeft] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowLowerMiddleLeft] * 2 + 1]
         );
-        vertexPoints[FaceLandmark.leftEyebrowCenter * 2] = point[0];
-        vertexPoints[FaceLandmark.leftEyebrowCenter * 2 + 1] = point[1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowCenter] * 2] = point[0];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowCenter] * 2 + 1] = point[1];
 
         // 右眉心
         FacePointsUtils.getCenter(point,
-                vertexPoints[FaceLandmark.rightEyebrowUpperMiddleRight * 2],
-                vertexPoints[FaceLandmark.rightEyebrowUpperMiddleRight * 2 + 1],
-                vertexPoints[FaceLandmark.rightEyebrowLowerMiddleRight * 2],
-                vertexPoints[FaceLandmark.rightEyebrowLowerMiddleRight * 2 + 1]
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowUpperMiddleRight] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowUpperMiddleRight] * 2 + 1],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowLowerMiddleRight] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowLowerMiddleRight] * 2 + 1]
         );
-        vertexPoints[FaceLandmark.rightEyebrowCenter * 2] = point[0];
-        vertexPoints[FaceLandmark.rightEyebrowCenter * 2 + 1] = point[1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowCenter] * 2] = point[0];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowCenter] * 2 + 1] = point[1];
 
         // 额头中心
-        vertexPoints[FaceLandmark.headCenter * 2] = vertexPoints[FaceLandmark.eyeCenter * 2] * 2.0f - vertexPoints[FaceLandmark.noseBottomMiddle * 2];
-        vertexPoints[FaceLandmark.headCenter * 2 + 1] = vertexPoints[FaceLandmark.eyeCenter * 2 + 1] * 2.0f - vertexPoints[FaceLandmark.noseBottomMiddle * 2 + 1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.headCenter] * 2] = vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.eyeCenter] * 2] * 2.0f - vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.noseBottomMiddle] * 2];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.headCenter] * 2 + 1] = vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.eyeCenter] * 2 + 1] * 2.0f - vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.noseBottomMiddle] * 2 + 1];
 
         // 额头左侧，备注：这个点不太准确，后续优化
         FacePointsUtils.getCenter(point,
-                vertexPoints[FaceLandmark.leftEyebrowUpperLeftCorner * 2],
-                vertexPoints[FaceLandmark.leftEyebrowUpperLeftCorner * 2 + 1],
-                vertexPoints[FaceLandmark.headCenter * 2],
-                vertexPoints[FaceLandmark.headCenter * 2 + 1]
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowUpperLeftCorner] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftEyebrowUpperLeftCorner] * 2 + 1],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.headCenter] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.headCenter] * 2 + 1]
         );
-        vertexPoints[FaceLandmark.leftHead * 2] = point[0];
-        vertexPoints[FaceLandmark.leftHead * 2 + 1] = point[1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftHead] * 2] = point[0];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftHead] * 2 + 1] = point[1];
 
         // 额头右侧，备注：这个点不太准确，后续优化
         FacePointsUtils.getCenter(point,
-                vertexPoints[FaceLandmark.rightEyebrowUpperRightCorner * 2],
-                vertexPoints[FaceLandmark.rightEyebrowUpperRightCorner * 2 + 1],
-                vertexPoints[FaceLandmark.headCenter * 2],
-                vertexPoints[FaceLandmark.headCenter * 2 + 1]
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowUpperRightCorner] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightEyebrowUpperRightCorner] * 2 + 1],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.headCenter] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.headCenter] * 2 + 1]
         );
-        vertexPoints[FaceLandmark.rightHead * 2] = point[0];
-        vertexPoints[FaceLandmark.rightHead * 2 + 1] = point[1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightHead] * 2] = point[0];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightHead] * 2 + 1] = point[1];
 
         // 左脸颊中心
         FacePointsUtils.getCenter(point,
-                vertexPoints[FaceLandmark.leftCheekEdgeCenter * 2],
-                vertexPoints[FaceLandmark.leftCheekEdgeCenter * 2 + 1],
-                vertexPoints[FaceLandmark.noseBottomLeft * 2],
-                vertexPoints[FaceLandmark.noseBottomLeft * 2 + 1]
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftCheekEdgeCenter] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftCheekEdgeCenter] * 2 + 1],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.noseBottomLeft] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.noseBottomLeft] * 2 + 1]
         );
-        vertexPoints[FaceLandmark.leftCheekCenter * 2] = point[0];
-        vertexPoints[FaceLandmark.leftCheekCenter * 2 + 1] = point[1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftCheekCenter] * 2] = point[0];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.leftCheekCenter] * 2 + 1] = point[1];
 
         // 右脸颊中心
         FacePointsUtils.getCenter(point,
-                vertexPoints[FaceLandmark.rightCheekEdgeCenter * 2],
-                vertexPoints[FaceLandmark.rightCheekEdgeCenter * 2 + 1],
-                vertexPoints[FaceLandmark.noseBottomRight * 2],
-                vertexPoints[FaceLandmark.noseBottomRight * 2 + 1]
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightCheekEdgeCenter] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightCheekEdgeCenter] * 2 + 1],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.noseBottomRight] * 2],
+                vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.noseBottomRight] * 2 + 1]
         );
-        vertexPoints[FaceLandmark.rightCheekCenter * 2] = point[0];
-        vertexPoints[FaceLandmark.rightCheekCenter * 2 + 1] = point[1];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightCheekCenter] * 2] = point[0];
+        vertexPoints[FaceLandmark.reversedIndex[FaceLandmark.rightCheekCenter] * 2 + 1] = point[1];
     }
 
     /**
      * 计算
+     *
      * @param vertexPoints
      */
     private void calculateImageEdgePoints(float[] vertexPoints) {
@@ -280,6 +291,7 @@ public final class LandmarkEngine {
 
     /**
      * 获取用于美型处理的坐标
+     *
      * @param vertexPoints  顶点坐标，一共122个顶点
      * @param texturePoints 纹理坐标，一共122个顶点
      * @param faceIndex     人脸索引
@@ -301,6 +313,7 @@ public final class LandmarkEngine {
 
     /**
      * 阴影(修容)顶点坐标，修容用的是整个人脸的顶点坐标
+     *
      * @param vetexPoints
      * @param faceIndex
      */
@@ -310,6 +323,7 @@ public final class LandmarkEngine {
 
     /**
      * 取得脸颊(腮红)顶点坐标
+     *
      * @param vertexPoints
      * @param faceIndex
      */
@@ -319,6 +333,7 @@ public final class LandmarkEngine {
 
     /**
      * 取得眉毛顶点坐标
+     *
      * @param vertexPoints
      * @param faceIndex
      */
@@ -328,6 +343,7 @@ public final class LandmarkEngine {
 
     /**
      * 取得眼睛(眼影、眼线等)顶点坐标，可参考assets目录下的 眼睛遮罩标注.jpg
+     *
      * @param vertexPoints
      * @param faceIndex
      */
@@ -352,7 +368,7 @@ public final class LandmarkEngine {
         // 关键点42 ~ 44，index = 9 ~ 11 3个
         for (int i = 42; i < 45; i++) {
             vertexPoints[(i - 42 + 9) * 2] = mFaceArrays.get(faceIndex).vertexPoints[i * 2];
-            vertexPoints[(i - 42 + 9) * 2 + 1] = mFaceArrays.get(faceIndex).vertexPoints[i * 2 +  1];
+            vertexPoints[(i - 42 + 9) * 2 + 1] = mFaceArrays.get(faceIndex).vertexPoints[i * 2 + 1];
         }
 
         // 关键点52 ~ 73，index = 12 ~ 33 22个
@@ -388,8 +404,9 @@ public final class LandmarkEngine {
 
     /**
      * 取得嘴唇(唇彩)顶点坐标
-     * @param vertexPoints  存放嘴唇顶点坐标
-     * @param faceIndex     人脸索引
+     *
+     * @param vertexPoints 存放嘴唇顶点坐标
+     * @param faceIndex    人脸索引
      */
     public synchronized void getLipsVertices(float[] vertexPoints, int faceIndex) {
         // 嘴唇一共20个顶点，大小必须为40
@@ -407,6 +424,7 @@ public final class LandmarkEngine {
 
     /**
      * 取得亮眼需要的顶点坐标
+     *
      * @param vertexPoints
      * @param faceIndex
      */
@@ -437,6 +455,7 @@ public final class LandmarkEngine {
 
     /**
      * 取得美牙需要的顶点坐标，嘴巴周围12个顶点
+     *
      * @param vertexPoints
      * @param faceIndex
      */

@@ -7,9 +7,11 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.cgfay.landmark.FaceLandmark;
 import com.cgfay.landmark.LandmarkEngine;
 import com.cgfay.landmark.OneFace;
 import com.zeusee.main.hyperlandmark.CameraOverlap;
+import com.zeusee.main.hyperlandmark.FileUtil;
 import com.zeusee.main.hyperlandmark.R;
 import com.zeusee.main.hyperlandmark.listener.FaceTrackerCallback;
 import com.zeusee.main.hyperlandmark.utils.ConUtil;
@@ -23,6 +25,7 @@ import static java.lang.Math.abs;
 
 public class FaceTracking {
     private static final String TAG = "FaceTracking";
+
     static {
         System.loadLibrary("zeuseesTracking-lib");
     }
@@ -240,7 +243,7 @@ public class FaceTracking {
     }
 
 
-    public void faceTrackingInit(String pathModel, int height, int width) {
+    public static void faceTrackingInit(String pathModel, int height, int width) {
         session = createSession(pathModel);
         faces = new ArrayList<>();
         initTracker(height, width, CameraOverlap.SCALLE_FACTOR, session);
@@ -448,7 +451,7 @@ public class FaceTracking {
             } else {
                 faceTrackParam.rotateAngle = faceTrackParam.isBackCamera ? orientation : 360 - orientation;
             }
-
+            faceTrackingInit(FileUtil.modelPath + "/models", height, width);
 //            int left = 0;
 //            int top = 0;
 //            int right = width;
@@ -499,7 +502,7 @@ public class FaceTracking {
                 rotation = 360 - faceTrackParam.rotateAngle;
             }
             // 设置旋转角度
-            update(data, height, width, rotation, true, session);
+            update(data, height, width, rotation, false, session);
             int numsFace = getTrackingNum(session);
 
 
@@ -578,49 +581,54 @@ public class FaceTracking {
                 if (oneFace.vertexPoints == null || oneFace.vertexPoints.length != face.landmarks.length) {
                     oneFace.vertexPoints = new float[face.landmarks.length];
                 }
-                for (int j = 0; j<face.landmarks.length;j++){
-                    oneFace.vertexPoints[j] = face.landmarks[j] * 1.0f;
+                for (int j = 0; j < face.landmarks.length / 2; j++) {
+                    // orientation = 0、3 表示竖屏，1、2 表示横屏
+                    float x = (face.landmarks[2 * j] * 1.0f / height) * 2 - 1;
+                    float y = (face.landmarks[2 * j + 1] * 1.0f / width) * 2 - 1;
+
+                    float[] point = new float[]{x, -y};
+                    if (orientation == 1) {
+                        if (faceTrackParam.previewTrack && faceTrackParam.isBackCamera) {
+                            point[0] = -y;
+                            point[1] = -x;
+                        } else {
+                            point[0] = y;
+                            point[1] = x;
+                        }
+                    } else if (orientation == 2) {
+                        if (faceTrackParam.previewTrack && faceTrackParam.isBackCamera) {
+                            point[0] = y;
+                            point[1] = x;
+                        } else {
+                            point[0] = -y;
+                            point[1] = -x;
+                        }
+                    } else if (orientation == 3) {
+                        point[0] = -x;
+                        point[1] = y;
+                    }
+                    float fixedX = 0;
+                    float fixedY = 0;
+                    // 顶点坐标
+                    if (faceTrackParam.previewTrack) {
+                        if (faceTrackParam.isBackCamera) {
+                            fixedX = point[0];
+                        } else {
+                            fixedX = -point[0];
+                        }
+                    } else { // 非预览状态下，左右不需要翻转
+                        fixedX = point[0];
+                    }
+                    fixedY = point[1];
+                    int index = FaceLandmark.reversedIndex[j];
+//                    Log.d(TAG, "onFaceTracking j = " + j + "; index = " + index + "; fixedX = " + fixedX + "; fixedY = " + fixedY + "; orientation = " + orientation);
+                    oneFace.vertexPoints[2 * index] = fixedX;
+                    oneFace.vertexPoints[2 * index + 1] = fixedY;
                 }
-//                for (int j = 0; j < face.landmarks.length / 2; i++) {
-//                    // orientation = 0、3 表示竖屏，1、2 表示横屏
-//                    float x = (face.landmarks[2 * j] * 1.0f / height) * 2 - 1;
-//                    float y = (face.landmarks[2 * j] * 1.0f / width) * 2 - 1;
-//                    float[] point = new float[]{x, -y};
-//                    if (orientation == 1) {
-//                        if (faceTrackParam.previewTrack && faceTrackParam.isBackCamera) {
-//                            point[0] = -y;
-//                            point[1] = -x;
-//                        } else {
-//                            point[0] = y;
-//                            point[1] = x;
-//                        }
-//                    } else if (orientation == 2) {
-//                        if (faceTrackParam.previewTrack && faceTrackParam.isBackCamera) {
-//                            point[0] = y;
-//                            point[1] = x;
-//                        } else {
-//                            point[0] = -y;
-//                            point[1] = -x;
-//                        }
-//                    } else if (orientation == 3) {
-//                        point[0] = -x;
-//                        point[1] = y;
-//                    }
-//                    // 顶点坐标
-//                    if (faceTrackParam.previewTrack) {
-//                        if (faceTrackParam.isBackCamera) {
-//                            oneFace.vertexPoints[2 * j] = point[0];
-//                        } else {
-//                            oneFace.vertexPoints[2 * j] = -point[0];
-//                        }
-//                    } else { // 非预览状态下，左右不需要翻转
-//                        oneFace.vertexPoints[2 * j] = point[0];
-//                    }
-//                    oneFace.vertexPoints[2 * j + 1] = point[1];
-//                }
+
                 // 插入人脸对象
                 LandmarkEngine.getInstance().putOneFace(i, oneFace);
-                Log.d(TAG,"internalTrackFace, putOneFace i = "+i);
+//                Log.d(TAG, "internalTrackFace, putOneFace i = " + i);
                 if (flag == -2)
                     face.isStable = true;
                 else

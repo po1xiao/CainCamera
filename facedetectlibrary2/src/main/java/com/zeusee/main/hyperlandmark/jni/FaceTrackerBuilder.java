@@ -22,7 +22,6 @@ public final class FaceTrackerBuilder {
      * 准备检测器
      */
     public void initTracker() {
-        mFaceTracker.faceTrackingInit(FileUtil.modelPath + "/models", 1280, 720);
         mFaceTracker.initTracker();
     }
 

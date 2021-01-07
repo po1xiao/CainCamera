@@ -13,7 +13,7 @@ public class CameraOverlap {
     protected Camera.CameraInfo mCameraInfo = null;
     public static final int PREVIEW_WIDTH = 640;
     public static final int PREVIEW_HEIGHT = 480;
-    public static final int SCALLE_FACTOR = 2;
+    public static final int SCALLE_FACTOR = 1;
 
     private int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private Camera.PreviewCallback mPreviewCallback;
