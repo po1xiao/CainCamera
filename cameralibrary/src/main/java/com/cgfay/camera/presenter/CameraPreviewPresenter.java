@@ -1,10 +1,12 @@
 package com.cgfay.camera.presenter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+
 import android.opengl.EGLContext;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +16,7 @@ import androidx.annotation.NonNull;
 import com.cgfay.camera.activity.CameraSettingActivity;
 import com.cgfay.camera.camera.CameraController;
 import com.cgfay.camera.camera.CameraParam;
+import com.cgfay.camera.camera.CameraXController;
 import com.cgfay.camera.camera.ICameraController;
 import com.cgfay.camera.camera.OnFrameAvailableListener;
 import com.cgfay.camera.camera.OnSurfaceTextureListener;
@@ -72,7 +75,7 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
     // 预览参数
     private CameraParam mCameraParam;
 
-    private Activity mActivity;
+    private FragmentActivity mActivity;
 
     // 背景音乐
     private String mMusicPath;
@@ -124,7 +127,7 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
         mCommandEditor = new CainCommandEditor();
     }
 
-    public void onAttach(Activity activity) {
+    public void onAttach(FragmentActivity activity) {
         mActivity = activity;
         mVideoParams.setVideoPath(PathConstraints.getVideoTempPath(mActivity));
         mAudioParams.setAudioPath(PathConstraints.getAudioTempPath(mActivity));
@@ -133,7 +136,7 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
 
 //        // 备注：目前支持CameraX的渲染流程，但CameraX回调预览帧数据有些问题，人脸关键点SDK检测返回的数据错乱，暂不建议在商用项目中使用CameraX
 //        if (CameraApi.hasCamera2(mActivity)) {
-//            mCameraController = new CameraXController(getTarget(), ContextCompat.getMainExecutor(mActivity));
+//            mCameraController = new CameraXController(mActivity);
 //        } else {
 //            mCameraController = new CameraController(mActivity);
 //        }
@@ -453,6 +456,13 @@ public class CameraPreviewPresenter extends PreviewPresenter<CameraPreviewFragme
     @Override
     public int getRecordedVideoSize() {
         return mVideoList.size();
+    }
+
+    @Override
+    public void changeFlashLight(boolean on) {
+        if (mCameraController != null) {
+            mCameraController.setFlashLight(on);
+        }
     }
 
     @Override

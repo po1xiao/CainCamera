@@ -67,7 +67,6 @@ public interface ICameraController {
 
     /**
      * 是否支持自动对焦
-     * @return
      */
     boolean canAutoFocus();
 
@@ -86,11 +85,21 @@ public interface ICameraController {
      * 判断是否支持闪光灯
      * @param front 是否前置摄像头
      */
-    boolean isSupportFlashLight(boolean front);
+    boolean supportTorch(boolean front);
 
     /**
      * 设置闪光灯
      * @param on 是否打开闪光灯
      */
     void setFlashLight(boolean on);
+
+    /**
+     * zoom in
+     */
+    void zoomIn();
+
+    /**
+     * zoom out
+     */
+    void zoomOut();
 }

@@ -94,7 +94,7 @@ public class RecordPresenter implements OnSurfaceTextureListener, OnFrameAvailab
 
         // 创建相机控制器
         if (CameraApi.hasCamera2(mActivity)) {
-            mCameraController = new CameraXController(activity, ContextCompat.getMainExecutor(activity));
+            mCameraController = new CameraXController(activity);
         } else {
             mCameraController = new CameraController(activity);
         }
