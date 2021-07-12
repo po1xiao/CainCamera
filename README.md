@@ -25,14 +25,8 @@ CainCamera是一个集美颜相机、图片编辑、短视频编辑等功能的�
 CameraX库升级到1.0.0-rc03版本，目前基本的人脸检测、美颜美肤等功能已基本适配，CameraX的部分功能仍未实现。等后续做完非线性编辑SDK之后，有时间再接入[MediaPipe](https://github.com/google/mediapipe)替换现有人脸SDK，敬请期待。
 
 
-# 关于人脸SDK验证问题
-关于人脸关键点SDK验证问题，由于采用Face++的试用版作为测试的，每天使用的次数有限
-所以这里建议大家到Face++官网(https://www.faceplusplus.com/) 注册一个Key使用，需要先注册Key，然后绑定Bundle(包名)才能使用。
-国内用户需要到https://www.faceplusplus.com.cn/ 注册。 注册流程如下:
-[Face++ SDK注册流程](https://github.com/CainKernel/CainCamera/blob/master/document/introduction/facepp_registration.md)
-
-更多关于Face++ SDK相关的问题，可以到Face++官方github询问：
-[MegviiFacepp-Android-SDK](https://github.com/FacePlusPlus/MegviiFacepp-Android-SDK)
+# 关于人脸识别开源库
+感谢：https://github.com/szad670401/HyperLandmark
 
 # library介绍:
 * cameralibrary: 相机库，包括渲染渲染线程、渲染引擎等流程
